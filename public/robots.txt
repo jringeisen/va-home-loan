@@ -12,4 +12,4 @@ Disallow: /support
 Disallow: /support/*
 
 # Sitemap location
-Sitemap: https://va-home-loan.test/sitemap.xml
+Sitemap: https://valoancalc.com/sitemap.xml

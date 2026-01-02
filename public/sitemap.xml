@@ -2,25 +2,25 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
         <loc>https://va-home-loan.test</loc>
-        <lastmod>2026-01-02T18:25:59+00:00</lastmod>
+        <lastmod>2026-01-02T23:46:04+00:00</lastmod>
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
     </url>
     <url>
         <loc>https://va-home-loan.test/calculators/affordability</loc>
-        <lastmod>2026-01-02T18:25:59+00:00</lastmod>
+        <lastmod>2026-01-02T23:46:04+00:00</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
     </url>
     <url>
         <loc>https://va-home-loan.test/calculators/disability</loc>
-        <lastmod>2026-01-02T18:25:59+00:00</lastmod>
+        <lastmod>2026-01-02T23:46:04+00:00</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
         <loc>https://va-home-loan.test/calculators/cost-of-living</loc>
-        <lastmod>2026-01-02T18:25:59+00:00</lastmod>
+        <lastmod>2026-01-02T23:46:04+00:00</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
