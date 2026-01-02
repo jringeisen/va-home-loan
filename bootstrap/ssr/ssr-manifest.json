@@ -1,70 +1,82 @@
 {
   "node_modules/laravel-vite-plugin/inertia-helpers/index.js": [],
   "resources/js/Components/Calculator/CalculatorActions.vue": [
-    "/build/assets/useCalculator-DFTlb9cV.js"
+    "/build/assets/useCalculator-Dckfh6tY.js"
   ],
   "resources/js/Components/Calculator/SaveCalculationModal.vue": [
-    "/build/assets/useCalculator-DFTlb9cV.js"
+    "/build/assets/useCalculator-Dckfh6tY.js"
   ],
   "resources/js/Components/Layout/AppLayout.vue": [
-    "/build/assets/AppLayout-DTISP9sP.js"
+    "/build/assets/AppLayout-D-7_U46O.js"
   ],
   "resources/js/Components/Layout/GuestLayout.vue": [
-    "/build/assets/GuestLayout-C4qAdsrB.js"
+    "/build/assets/GuestLayout-SY1V3ZB4.js"
   ],
   "resources/js/Components/Logos/Logo.vue": [
     "/build/assets/Logo-Ch_xRQ5X.js"
   ],
+  "resources/js/Components/Seo/Breadcrumbs.vue": [
+    "/build/assets/useCalculator-Dckfh6tY.js"
+  ],
+  "resources/js/Components/Seo/FaqSection.vue": [
+    "/build/assets/FaqSection-CuSUPrQB.js"
+  ],
+  "resources/js/Components/Seo/RelatedTools.vue": [
+    "/build/assets/useCalculator-Dckfh6tY.js"
+  ],
+  "resources/js/Components/Seo/SeoHead.vue": [
+    "/build/assets/FaqSection-CuSUPrQB.js"
+  ],
   "resources/js/Components/UI/AnimatedNumber.vue": [
-    "/build/assets/useCalculator-DFTlb9cV.js"
+    "/build/assets/useCalculator-Dckfh6tY.js"
   ],
   "resources/js/Components/UI/Tooltip.vue": [
-    "/build/assets/useCalculator-DFTlb9cV.js"
+    "/build/assets/Tooltip-hfBSPiJD.js"
   ],
   "resources/js/Composables/useCalculator.js": [
-    "/build/assets/useCalculator-DFTlb9cV.js"
+    "/build/assets/useCalculator-Dckfh6tY.js"
   ],
   "resources/js/Pages/Auth/ForgotPassword.vue": [
-    "/build/assets/ForgotPassword-B-jwSHbR.js"
+    "/build/assets/ForgotPassword-BqGkU5dP.js"
   ],
   "resources/js/Pages/Auth/Login.vue": [
-    "/build/assets/Login-EOrVJorR.js"
+    "/build/assets/Login-CBe99648.js"
   ],
   "resources/js/Pages/Auth/Register.vue": [
-    "/build/assets/Register-wXfn2NaJ.js"
+    "/build/assets/Register-v9sRUBDs.js"
   ],
   "resources/js/Pages/Auth/ResetPassword.vue": [
-    "/build/assets/ResetPassword-BCDdK094.js"
+    "/build/assets/ResetPassword-CJWjrmed.js"
   ],
   "resources/js/Pages/Auth/TwoFactorChallenge.vue": [
-    "/build/assets/TwoFactorChallenge-CEsEAfgr.js"
+    "/build/assets/TwoFactorChallenge-HoajBYn0.js"
   ],
   "resources/js/Pages/Calculators/Affordability.vue": [
-    "/build/assets/Affordability-BBBspQkY.js"
+    "/build/assets/Affordability-XYNLYdiE.js"
   ],
   "resources/js/Pages/Calculators/CostOfLiving.vue": [
-    "/build/assets/CostOfLiving-D974rezx.js"
+    "/build/assets/CostOfLiving-B85q03CN.js"
   ],
   "resources/js/Pages/Calculators/Disability.vue": [
-    "/build/assets/Disability-DOn9TaR4.js"
+    "/build/assets/Disability-PoIWHw1t.js"
   ],
   "resources/js/Pages/Dashboard/Calculations.vue": [
-    "/build/assets/Calculations-NESOeH_6.js"
+    "/build/assets/Calculations-BFITRQiL.js"
   ],
   "resources/js/Pages/Dashboard/Index.vue": [
-    "/build/assets/Index-CUPFRelc.js"
+    "/build/assets/Index-C4xzsPhj.js"
   ],
   "resources/js/Pages/Dashboard/Settings.vue": [
-    "/build/assets/Settings-B2ylrUhx.js"
+    "/build/assets/Settings-Baua7gdg.js"
   ],
   "resources/js/Pages/Home.vue": [
-    "/build/assets/Home-BoqVHSrU.js"
+    "/build/assets/Home-9rni30D2.js"
   ],
   "resources/js/Pages/Support/Index.vue": [
-    "/build/assets/Index-C3LcNkou.js"
+    "/build/assets/Index-TRyVfEyk.js"
   ],
   "resources/js/Pages/Support/ThankYou.vue": [
-    "/build/assets/ThankYou-B_rhAcj8.js"
+    "/build/assets/ThankYou-A4pZNON5.js"
   ],
   "resources/js/ssr.js": []
 }

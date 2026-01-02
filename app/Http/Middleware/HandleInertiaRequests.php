@@ -47,6 +47,7 @@ class HandleInertiaRequests extends Middleware
                 'siteName' => config('seo.site_name'),
                 'canonical' => $seoService->generateCanonicalUrl(),
                 'appUrl' => config('app.url'),
+                'currentYear' => date('Y'),
             ],
         ];
     }

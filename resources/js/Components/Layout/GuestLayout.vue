@@ -9,12 +9,14 @@ defineProps({
 
 const page = usePage()
 const currentUrl = computed(() => page.url)
+const currentYear = computed(() => page.props.seo?.currentYear || new Date().getFullYear())
 
 const isActive = (path) => {
     return currentUrl.value.startsWith(path)
 }
 
-// Dark mode
+// Dark mode - track if mounted for SSR hydration safety
+const isMounted = ref(false)
 const isDark = ref(false)
 
 const initDarkMode = () => {
@@ -42,6 +44,7 @@ const toggleDarkMode = () => {
 }
 
 onMounted(() => {
+    isMounted.value = true
     initDarkMode()
 })
 </script>
@@ -103,8 +106,9 @@ onMounted(() => {
                         </div>
                     </div>
                     <div class="hidden sm:ml-6 sm:flex sm:items-center sm:space-x-4">
-                        <!-- Dark Mode Toggle -->
+                        <!-- Dark Mode Toggle - only render after mount to avoid SSR hydration mismatch -->
                         <button
+                            v-if="isMounted"
                             @click="toggleDarkMode"
                             class="rounded-md p-2 text-gray-600 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-gray-200"
                             :title="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
@@ -117,6 +121,8 @@ onMounted(() => {
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
                             </svg>
                         </button>
+                        <!-- Placeholder for SSR to maintain layout -->
+                        <div v-else class="h-9 w-9"></div>
                         <Link
                             href="/login"
                             class="text-sm font-medium text-gray-600 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-100"
@@ -143,7 +149,7 @@ onMounted(() => {
         <footer class="border-t bg-white dark:border-gray-700 dark:bg-gray-800">
             <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
                 <p class="text-center text-sm text-gray-600 dark:text-gray-300">
-                    &copy; {{ new Date().getFullYear() }} VA Home Loan Calculator. All rights reserved.
+                    &copy; {{ currentYear }} VA Home Loan Calculator. All rights reserved.
                 </p>
             </div>
         </footer>
