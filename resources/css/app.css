@@ -1,0 +1,83 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/forms';
+@custom-variant dark (&:where(.dark, .dark *));
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+/* Print Styles */
+@media print {
+    /* Hide non-essential elements */
+    nav,
+    header,
+    footer,
+    .no-print,
+    button,
+    input,
+    select,
+    textarea,
+    [type="range"],
+    .fixed {
+        display: none !important;
+    }
+
+    /* Show print-only elements */
+    .print-show {
+        display: block !important;
+    }
+
+    /* Reset backgrounds for printing */
+    body {
+        background: white !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    /* Show print-only elements */
+    .print-only {
+        display: block !important;
+    }
+
+    /* Clean up layout */
+    .shadow {
+        box-shadow: none !important;
+        border: 1px solid #e5e7eb !important;
+    }
+
+    /* Ensure results section is visible and styled */
+    .print-results {
+        display: block !important;
+        page-break-inside: avoid;
+    }
+
+    /* Keep colored backgrounds for results */
+    .bg-blue-50,
+    .bg-green-50,
+    .bg-purple-50,
+    .bg-red-50 {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    /* Page margins */
+    @page {
+        margin: 1in;
+    }
+
+    /* Typography adjustments */
+    h1, h2, h3 {
+        page-break-after: avoid;
+    }
+
+    p {
+        orphans: 3;
+        widows: 3;
+    }
+}

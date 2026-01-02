@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(composer require:*)",
+      "Bash(npm install:*)",
+      "Bash(php artisan:*)",
+      "Bash(vendor/bin/pint:*)",
+      "Bash(npm run build:*)",
+      "mcp__laravel-boost__database-query",
+      "WebSearch",
+      "mcp__laravel-boost__tinker",
+      "mcp__laravel-boost__search-docs",
+      "WebFetch(domain:stripe.com)",
+      "WebFetch(domain:docs.stripe.com)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "mcp__laravel-boost__database-schema"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "laravel-boost",
+    "herd"
+  ]
+}

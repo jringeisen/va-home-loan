@@ -1,0 +1,70 @@
+{
+  "node_modules/laravel-vite-plugin/inertia-helpers/index.js": [],
+  "resources/js/Components/Calculator/CalculatorActions.vue": [
+    "/build/assets/useCalculator-DFTlb9cV.js"
+  ],
+  "resources/js/Components/Calculator/SaveCalculationModal.vue": [
+    "/build/assets/useCalculator-DFTlb9cV.js"
+  ],
+  "resources/js/Components/Layout/AppLayout.vue": [
+    "/build/assets/AppLayout-DTISP9sP.js"
+  ],
+  "resources/js/Components/Layout/GuestLayout.vue": [
+    "/build/assets/GuestLayout-C4qAdsrB.js"
+  ],
+  "resources/js/Components/Logos/Logo.vue": [
+    "/build/assets/Logo-Ch_xRQ5X.js"
+  ],
+  "resources/js/Components/UI/AnimatedNumber.vue": [
+    "/build/assets/useCalculator-DFTlb9cV.js"
+  ],
+  "resources/js/Components/UI/Tooltip.vue": [
+    "/build/assets/useCalculator-DFTlb9cV.js"
+  ],
+  "resources/js/Composables/useCalculator.js": [
+    "/build/assets/useCalculator-DFTlb9cV.js"
+  ],
+  "resources/js/Pages/Auth/ForgotPassword.vue": [
+    "/build/assets/ForgotPassword-B-jwSHbR.js"
+  ],
+  "resources/js/Pages/Auth/Login.vue": [
+    "/build/assets/Login-EOrVJorR.js"
+  ],
+  "resources/js/Pages/Auth/Register.vue": [
+    "/build/assets/Register-wXfn2NaJ.js"
+  ],
+  "resources/js/Pages/Auth/ResetPassword.vue": [
+    "/build/assets/ResetPassword-BCDdK094.js"
+  ],
+  "resources/js/Pages/Auth/TwoFactorChallenge.vue": [
+    "/build/assets/TwoFactorChallenge-CEsEAfgr.js"
+  ],
+  "resources/js/Pages/Calculators/Affordability.vue": [
+    "/build/assets/Affordability-BBBspQkY.js"
+  ],
+  "resources/js/Pages/Calculators/CostOfLiving.vue": [
+    "/build/assets/CostOfLiving-D974rezx.js"
+  ],
+  "resources/js/Pages/Calculators/Disability.vue": [
+    "/build/assets/Disability-DOn9TaR4.js"
+  ],
+  "resources/js/Pages/Dashboard/Calculations.vue": [
+    "/build/assets/Calculations-NESOeH_6.js"
+  ],
+  "resources/js/Pages/Dashboard/Index.vue": [
+    "/build/assets/Index-CUPFRelc.js"
+  ],
+  "resources/js/Pages/Dashboard/Settings.vue": [
+    "/build/assets/Settings-B2ylrUhx.js"
+  ],
+  "resources/js/Pages/Home.vue": [
+    "/build/assets/Home-BoqVHSrU.js"
+  ],
+  "resources/js/Pages/Support/Index.vue": [
+    "/build/assets/Index-C3LcNkou.js"
+  ],
+  "resources/js/Pages/Support/ThankYou.vue": [
+    "/build/assets/ThankYou-B_rhAcj8.js"
+  ],
+  "resources/js/ssr.js": []
+}

@@ -1,0 +1,366 @@
+<script setup>
+import { Head, Form } from '@inertiajs/vue3'
+import { computed } from 'vue'
+import AppLayout from '@/Components/Layout/AppLayout.vue'
+import Tooltip from '@/Components/UI/Tooltip.vue'
+import AnimatedNumber from '@/Components/UI/AnimatedNumber.vue'
+import CalculatorActions from '@/Components/Calculator/CalculatorActions.vue'
+import SaveCalculationModal from '@/Components/Calculator/SaveCalculationModal.vue'
+import { useCalculator } from '@/Composables/useCalculator'
+
+const props = defineProps({
+    states: Object,
+    results: Object,
+    inputs: Object,
+})
+
+// Default form values
+const defaultValues = {
+    from_state: 'TX',
+    to_state: 'CA',
+    current_salary: 75000,
+    is_military: false,
+    zip_code: '',
+    pay_grade: '',
+    has_dependents: false,
+}
+
+// Update URL with current display values for sharing (SSR-safe)
+const updateUrl = () => {
+    if (typeof window === 'undefined') return
+
+    const params = new URLSearchParams()
+    params.set('from', display.from_state)
+    params.set('to', display.to_state)
+    params.set('salary', display.current_salary)
+    if (display.is_military) {
+        params.set('military', 'true')
+        if (display.zip_code) params.set('zip', display.zip_code)
+        if (display.pay_grade) params.set('grade', display.pay_grade)
+        if (display.has_dependents) params.set('dependents', 'true')
+    }
+
+    const newUrl = `${window.location.pathname}?${params.toString()}`
+    window.history.replaceState({}, '', newUrl)
+}
+
+// Use the calculator composable
+const {
+    user,
+    formRef,
+    display,
+    loading,
+    error,
+    showSaveModal,
+    linkCopied,
+    onFormStart,
+    onFormFinish,
+    onFormError,
+    onInput,
+    openSaveModal,
+    closeSaveModal,
+    printResults,
+    copyLink,
+    formatCurrency,
+} = useCalculator({
+    defaultValues,
+    inputs: props.inputs,
+    updateUrl,
+})
+
+// Page-specific formatter
+const formatPercent = (value) => {
+    const sign = value >= 0 ? '+' : ''
+    return `${sign}${value.toFixed(1)}%`
+}
+
+// Placeholder for save modal
+const savePlaceholder = computed(() =>
+    `e.g., ${props.states[display.from_state]} to ${props.states[display.to_state]}`
+)
+
+// Transform function to convert form data types before submission
+const transformData = (data) => ({
+    ...data,
+    current_salary: parseFloat(data.current_salary) || 0,
+    is_military: data.is_military === 'on' || data.is_military === true,
+    has_dependents: data.has_dependents === 'on' || data.has_dependents === true,
+})
+</script>
+
+<template>
+    <AppLayout>
+        <Head title="Cost of Living Comparison Calculator">
+            <meta name="description" content="Compare cost of living between states for PCS moves and retirement planning. Includes housing, utilities, transportation, and BAH rate comparisons for military." />
+            <meta property="og:title" content="Cost of Living Comparison - Compare States for Military Moves" />
+            <meta property="og:description" content="Free cost of living calculator for veterans and military families. Compare states, calculate equivalent salary, and plan your next PCS move." />
+        </Head>
+
+        <div class="py-12">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="mb-8">
+                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Cost of Living Comparison</h1>
+                    <p class="mt-2 text-gray-600 dark:text-gray-300">
+                        Compare cost of living between states to make informed decisions about relocations.
+                    </p>
+                </div>
+
+                <div class="grid gap-8 lg:grid-cols-2">
+                    <!-- Input Form -->
+                    <div class="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
+                        <h2 class="mb-6 text-lg font-semibold text-gray-900 dark:text-white">Compare States</h2>
+
+                        <!-- Print-only summary of inputs -->
+                        <div class="print-show mb-6 hidden space-y-2 text-sm">
+                            <div class="flex justify-between border-b pb-1">
+                                <span class="text-gray-600">From State:</span>
+                                <span class="font-medium">{{ states[display.from_state] }}</span>
+                            </div>
+                            <div class="flex justify-between border-b pb-1">
+                                <span class="text-gray-600">To State:</span>
+                                <span class="font-medium">{{ states[display.to_state] }}</span>
+                            </div>
+                            <div class="flex justify-between border-b pb-1">
+                                <span class="text-gray-600">Current Annual Salary:</span>
+                                <span class="font-medium">{{ formatCurrency(display.current_salary) }}</span>
+                            </div>
+                            <div class="flex justify-between border-b pb-1">
+                                <span class="text-gray-600">Active Duty Military:</span>
+                                <span class="font-medium">{{ display.is_military ? 'Yes' : 'No' }}</span>
+                            </div>
+                            <div v-if="display.is_military && display.zip_code" class="flex justify-between border-b pb-1">
+                                <span class="text-gray-600">Current ZIP Code:</span>
+                                <span class="font-medium">{{ display.zip_code }}</span>
+                            </div>
+                            <div v-if="display.is_military && display.pay_grade" class="flex justify-between border-b pb-1">
+                                <span class="text-gray-600">Pay Grade:</span>
+                                <span class="font-medium">{{ display.pay_grade }}</span>
+                            </div>
+                            <div v-if="display.is_military" class="flex justify-between border-b pb-1">
+                                <span class="text-gray-600">With Dependents:</span>
+                                <span class="font-medium">{{ display.has_dependents ? 'Yes' : 'No' }}</span>
+                            </div>
+                        </div>
+
+                        <Form
+                            ref="formRef"
+                            action="/calculators/cost-of-living/calculate"
+                            method="post"
+                            :transform="transformData"
+                            :options="{ preserveState: true, preserveScroll: true, preserveUrl: true }"
+                            class="no-print space-y-6"
+                            @input="onInput"
+                            @start="onFormStart"
+                            @finish="onFormFinish"
+                            @error="onFormError"
+                        >
+                            <div class="grid gap-4 sm:grid-cols-2">
+                                <div>
+                                    <label for="from_state" class="block text-sm font-medium text-gray-700 dark:text-gray-300">From State</label>
+                                    <select
+                                        id="from_state"
+                                        name="from_state"
+                                        :value="display.from_state"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                                    >
+                                        <option v-for="(name, code) in states" :key="code" :value="code">{{ name }}</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label for="to_state" class="block text-sm font-medium text-gray-700 dark:text-gray-300">To State</label>
+                                    <select
+                                        id="to_state"
+                                        name="to_state"
+                                        :value="display.to_state"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                                    >
+                                        <option v-for="(name, code) in states" :key="code" :value="code">{{ name }}</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label for="current_salary" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Current Annual Salary</label>
+                                <div class="relative mt-1">
+                                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-600 dark:text-gray-300" aria-hidden="true">$</span>
+                                    <input
+                                        id="current_salary"
+                                        name="current_salary"
+                                        :value="display.current_salary"
+                                        type="number"
+                                        class="block w-full rounded-md border-gray-300 pl-7 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                                    />
+                                </div>
+                            </div>
+
+                            <div class="flex items-center">
+                                <input
+                                    id="military"
+                                    name="is_military"
+                                    type="checkbox"
+                                    :checked="display.is_military"
+                                    class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700"
+                                />
+                                <Tooltip content="Basic Allowance for Housing (BAH) varies by location, pay grade, and dependency status. Enable this to compare BAH rates between locations.">
+                                    <label for="military" class="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                                        Active duty military (show BAH comparison)
+                                    </label>
+                                </Tooltip>
+                            </div>
+
+                            <div v-if="display.is_military" class="space-y-4 rounded-lg bg-gray-50 p-4 dark:bg-gray-700/50">
+                                <div>
+                                    <label for="zip_code" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Current ZIP Code</label>
+                                    <input
+                                        id="zip_code"
+                                        name="zip_code"
+                                        :value="display.zip_code"
+                                        type="text"
+                                        maxlength="5"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label for="pay_grade" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Pay Grade</label>
+                                    <select
+                                        id="pay_grade"
+                                        name="pay_grade"
+                                        :value="display.pay_grade"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                                    >
+                                        <option value="">Select...</option>
+                                        <option v-for="grade in ['E-1', 'E-2', 'E-3', 'E-4', 'E-5', 'E-6', 'E-7', 'E-8', 'E-9', 'O-1', 'O-2', 'O-3', 'O-4', 'O-5', 'O-6', 'O-7', 'O-8', 'O-9', 'O-10']" :key="grade" :value="grade">
+                                            {{ grade }}
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <div class="flex items-center">
+                                    <input
+                                        id="dependents"
+                                        name="has_dependents"
+                                        type="checkbox"
+                                        :checked="display.has_dependents"
+                                        class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700"
+                                    />
+                                    <label for="dependents" class="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                                        With dependents
+                                    </label>
+                                </div>
+                            </div>
+                        </Form>
+                    </div>
+
+                    <!-- Results -->
+                    <div class="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
+                        <h2 class="mb-6 text-lg font-semibold text-gray-900 dark:text-white">Comparison Results</h2>
+
+                        <div v-if="loading" class="flex items-center justify-center py-12" role="status" aria-label="Calculating results">
+                            <div class="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" aria-hidden="true"></div>
+                            <span class="sr-only">Calculating...</span>
+                        </div>
+
+                        <div v-else-if="error" class="rounded-md bg-red-50 p-4">
+                            <p class="text-sm text-red-700">{{ error }}</p>
+                        </div>
+
+                        <div v-else-if="props.results" class="space-y-6">
+                            <!-- Overall Comparison -->
+                            <div :class="[
+                                'rounded-lg p-4',
+                                props.results.overall_percent_change > 0 ? 'bg-red-50 dark:bg-red-900/30' : 'bg-green-50 dark:bg-green-900/30'
+                            ]">
+                                <p class="text-sm font-medium" :class="props.results.overall_percent_change > 0 ? 'text-red-700 dark:text-red-300' : 'text-green-700 dark:text-green-300'">
+                                    {{ props.results.cost_difference_description }}
+                                </p>
+                                <p class="text-2xl font-bold" :class="props.results.overall_percent_change > 0 ? 'text-red-900 dark:text-white' : 'text-green-900 dark:text-white'">
+                                    {{ formatPercent(props.results.overall_percent_change) }}
+                                </p>
+                                <p class="text-sm" :class="props.results.overall_percent_change > 0 ? 'text-red-800 dark:text-red-200' : 'text-green-800 dark:text-green-200'">
+                                    {{ states[props.results.to_state] }} vs {{ states[props.results.from_state] }}
+                                </p>
+                            </div>
+
+                            <!-- Category Breakdown -->
+                            <div>
+                                <h3 class="mb-3 font-medium text-gray-900 dark:text-white">Category Breakdown</h3>
+                                <div class="space-y-3">
+                                    <div v-for="(data, category) in props.results.category_comparison" :key="category" class="flex items-center justify-between">
+                                        <span class="text-gray-600 capitalize dark:text-gray-300">{{ category.replace('_', ' ') }}</span>
+                                        <span :class="['font-medium', data.percent_change > 0 ? 'text-red-700 dark:text-red-400' : 'text-green-700 dark:text-green-400']">
+                                            {{ formatPercent(data.percent_change) }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Equivalent Salary -->
+                            <div v-if="props.results.equivalent_salary" class="rounded-lg bg-blue-50 p-4 dark:bg-blue-900/30">
+                                <h3 class="font-medium text-blue-800 dark:text-blue-300">Equivalent Salary</h3>
+                                <p class="text-sm text-blue-600 dark:text-blue-400">
+                                    To maintain your standard of living in {{ states[props.results.to_state] }}, you would need:
+                                </p>
+                                <p class="text-2xl font-bold text-blue-900 dark:text-white">
+                                    <AnimatedNumber :value="props.results.equivalent_salary" :format="formatCurrency" />
+                                </p>
+                                <p class="text-sm text-blue-600 dark:text-blue-400">
+                                    ({{ props.results.salary_adjustment >= 0 ? '+' : '' }}{{ formatCurrency(props.results.salary_adjustment) }} from current)
+                                </p>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <CalculatorActions
+                                :link-copied="linkCopied"
+                                :show-save="!!user"
+                                save-label="Save Comparison"
+                                @copy="copyLink"
+                                @print="printResults"
+                                @save="openSaveModal"
+                            />
+
+                            <div v-if="!user" class="text-center">
+                                <p class="text-sm text-gray-600 dark:text-gray-300">
+                                    <a href="/register" class="font-medium text-green-700 underline hover:text-green-600 dark:text-green-400 dark:hover:text-green-300">
+                                        Create an account
+                                    </a>
+                                    to save your comparisons.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Sources -->
+                <div class="mt-8 rounded-lg bg-gray-50 p-4 dark:bg-gray-800/50">
+                    <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">Data Sources</h3>
+                    <ul class="mt-2 space-y-1 text-xs text-gray-600 dark:text-gray-300">
+                        <li>
+                            Cost of living indices (grocery, housing, utilities, transportation, health, misc):
+                            <a href="https://meric.mo.gov/data/cost-living-data-series" target="_blank" rel="noopener noreferrer" class="text-blue-700 underline hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300">
+                                MERIC Q3 2025
+                            </a>
+                        </li>
+                        <li>
+                            State tax burden data:
+                            <a href="https://wallethub.com/edu/states-with-highest-lowest-tax-burden/20494" target="_blank" rel="noopener noreferrer" class="text-blue-700 underline hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300">
+                                WalletHub 2025
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Save Modal -->
+        <SaveCalculationModal
+            :show="showSaveModal"
+            type="cost_of_living"
+            :inputs="display"
+            :results="props.results"
+            :placeholder="savePlaceholder"
+            @close="closeSaveModal"
+        />
+    </AppLayout>
+</template>
