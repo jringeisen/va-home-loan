@@ -2,7 +2,6 @@
 import { Form, usePage } from '@inertiajs/vue3'
 import { computed } from 'vue'
 import AppLayout from '@/Components/Layout/AppLayout.vue'
-import Tooltip from '@/Components/UI/Tooltip.vue'
 import AnimatedNumber from '@/Components/UI/AnimatedNumber.vue'
 import CalculatorActions from '@/Components/Calculator/CalculatorActions.vue'
 import SaveCalculationModal from '@/Components/Calculator/SaveCalculationModal.vue'
@@ -23,8 +22,8 @@ const page = usePage()
 const appUrl = computed(() => page.props.seo?.appUrl || '')
 
 // SEO Data
-const seoTitle = 'Military Cost of Living Calculator | Compare States for PCS'
-const seoDescription = 'Compare cost of living between states for military PCS moves. Includes BAH rates, housing costs, and equivalent salary calculations for veterans.'
+const seoTitle = 'Cost of Living Calculator | Compare States for Relocation'
+const seoDescription = 'Compare cost of living between states for relocations. Compare housing, utilities, transportation, taxes, and calculate equivalent salary needed.'
 const canonical = computed(() => `${appUrl.value}/calculators/cost-of-living`)
 
 // Breadcrumbs
@@ -37,32 +36,32 @@ const breadcrumbItems = computed(() => [
 // FAQ Data for SEO
 const faqQuestions = [
     {
-        question: 'How does cost of living vary between states for military?',
-        answer: 'Cost of living varies significantly between states, with factors like housing, utilities, transportation, and groceries all playing a role. For military families, the impact is partially offset by BAH (Basic Allowance for Housing), which adjusts based on your duty station location. High-cost areas like California and Hawaii have higher BAH rates, while lower-cost states may provide more purchasing power with your base pay.',
+        question: 'How does cost of living vary between states?',
+        answer: 'Cost of living varies significantly between states, with factors like housing, utilities, transportation, groceries, healthcare, and taxes all playing a role. States like Mississippi, Oklahoma, and Kansas have the lowest overall costs, while Hawaii, California, and New York are among the most expensive. Housing typically accounts for the largest difference between states.',
     },
     {
-        question: 'What is BAH and how does it affect my move decision?',
-        answer: 'BAH (Basic Allowance for Housing) is a tax-free military benefit that helps cover housing costs at your duty station. BAH rates are calculated based on your pay grade, dependency status, and the cost of housing in your ZIP code area. When considering a PCS move, comparing BAH rates between locations can help you understand how your housing budget will change.',
-    },
-    {
-        question: 'Which states have the lowest cost of living for veterans?',
-        answer: 'States with the lowest overall cost of living typically include Mississippi, Oklahoma, Kansas, Alabama, and Missouri. These states offer lower housing costs, utilities, and general expenses. However, veterans should also consider factors like state income tax exemptions for military retirement pay, property tax exemptions for disabled veterans, and access to VA healthcare facilities.',
+        question: 'Which states have the lowest cost of living?',
+        answer: 'States with the lowest overall cost of living typically include Mississippi, Oklahoma, Kansas, Alabama, and Missouri. These states offer lower housing costs, utilities, and general expenses. However, you should also consider factors like job market, quality of life, climate, and proximity to family when deciding where to relocate.',
     },
     {
         question: 'How do I calculate equivalent salary when moving states?',
         answer: 'To calculate equivalent salary, you adjust your current income by the cost of living difference between states. If you earn $75,000 in Texas and move to California where costs are 20% higher, you would need approximately $90,000 to maintain the same standard of living. Our calculator performs this calculation automatically based on comprehensive cost of living data.',
     },
     {
-        question: 'What factors should veterans consider when relocating?',
-        answer: 'Beyond cost of living, veterans should consider: state income tax treatment of military retirement and VA disability, property tax exemptions for veterans, proximity to VA healthcare facilities, job market for your skills, quality of schools if you have children, climate preferences, and distance from family. Many states offer significant tax benefits for veterans that can offset higher living costs.',
+        question: 'What factors should I consider when relocating to another state?',
+        answer: 'Beyond cost of living, consider: state income tax rates (some states have no income tax), property tax rates, job market for your skills, quality of schools if you have children, healthcare availability, climate preferences, distance from family, and overall quality of life. A lower cost of living state may not be the best choice if job opportunities are limited.',
     },
     {
-        question: 'Are there states with no income tax for military?',
-        answer: 'Nine states have no state income tax at all: Alaska, Florida, Nevada, New Hampshire (limited), South Dakota, Tennessee, Texas, Washington, and Wyoming. Additionally, many states exempt military retirement pay from state income tax, and all states exempt VA disability compensation from taxation. This can result in significant savings for veterans and retirees.',
+        question: 'Are there states with no income tax?',
+        answer: 'Nine states have no state income tax: Alaska, Florida, Nevada, New Hampshire (limited to interest and dividends), South Dakota, Tennessee, Texas, Washington, and Wyoming. Moving to one of these states can result in significant tax savings, though they may have higher property or sales taxes to compensate.',
     },
     {
-        question: 'How accurate is cost of living data for PCS planning?',
-        answer: 'Our calculator uses data from MERIC (Missouri Economic Research and Information Center) which provides quarterly cost of living indices based on actual pricing data. While individual experiences may vary based on lifestyle choices, this data provides a reliable baseline for comparing states. For PCS moves, combining this with BAH rate comparisons gives a comprehensive view of financial impact.',
+        question: 'How accurate is cost of living data?',
+        answer: 'Our calculator uses data from MERIC (Missouri Economic Research and Information Center) which provides quarterly cost of living indices based on actual pricing data across multiple categories. While individual experiences may vary based on lifestyle choices and specific cities within a state, this data provides a reliable baseline for comparing states.',
+    },
+    {
+        question: 'What categories are included in cost of living calculations?',
+        answer: 'Our calculator compares seven key categories: housing (28% weight), taxes (25% weight), transportation (12%), miscellaneous goods and services (12%), grocery (10%), utilities (8%), and healthcare (5%). Housing and taxes typically have the largest impact on overall cost of living differences between states.',
     },
 ]
 
@@ -85,10 +84,6 @@ const defaultValues = {
     from_state: 'TX',
     to_state: 'CA',
     current_salary: 75000,
-    is_military: false,
-    zip_code: '',
-    pay_grade: '',
-    has_dependents: false,
 }
 
 // Update URL with current display values for sharing (SSR-safe)
@@ -99,12 +94,6 @@ const updateUrl = () => {
     params.set('from', display.from_state)
     params.set('to', display.to_state)
     params.set('salary', display.current_salary)
-    if (display.is_military) {
-        params.set('military', 'true')
-        if (display.zip_code) params.set('zip', display.zip_code)
-        if (display.pay_grade) params.set('grade', display.pay_grade)
-        if (display.has_dependents) params.set('dependents', 'true')
-    }
 
     const newUrl = `${window.location.pathname}?${params.toString()}`
     window.history.replaceState({}, '', newUrl)
@@ -149,8 +138,6 @@ const savePlaceholder = computed(() =>
 const transformData = (data) => ({
     ...data,
     current_salary: parseFloat(data.current_salary) || 0,
-    is_military: data.is_military === 'on' || data.is_military === true,
-    has_dependents: data.has_dependents === 'on' || data.has_dependents === true,
 })
 </script>
 
@@ -181,10 +168,7 @@ const transformData = (data) => ({
                 <!-- Intro Content for SEO -->
                 <div class="prose prose-blue mb-8 max-w-none no-print dark:prose-invert">
                     <p class="text-gray-700 dark:text-gray-300">
-                        Planning a PCS move or considering retirement relocation? Understanding the cost of living differences between states is crucial for maintaining your standard of living. This calculator compares comprehensive cost data across housing, utilities, transportation, groceries, healthcare, and more.
-                    </p>
-                    <p class="text-gray-700 dark:text-gray-300">
-                        For active-duty service members, we also compare BAH (Basic Allowance for Housing) rates between locations to give you a complete picture of how your military compensation will be affected by the move.
+                        Considering a move to another state? Understanding the cost of living differences is crucial for maintaining your standard of living and making informed financial decisions. This calculator compares comprehensive cost data across housing, utilities, transportation, groceries, healthcare, taxes, and more.
                     </p>
                     <p class="text-gray-700 dark:text-gray-300">
                         Enter your current and destination states, along with your salary, to see the percentage difference in costs and calculate the equivalent salary you would need to maintain your current lifestyle.
@@ -209,22 +193,6 @@ const transformData = (data) => ({
                             <div class="flex justify-between border-b pb-1">
                                 <span class="text-gray-600">Current Annual Salary:</span>
                                 <span class="font-medium">{{ formatCurrency(display.current_salary) }}</span>
-                            </div>
-                            <div class="flex justify-between border-b pb-1">
-                                <span class="text-gray-600">Active Duty Military:</span>
-                                <span class="font-medium">{{ display.is_military ? 'Yes' : 'No' }}</span>
-                            </div>
-                            <div v-if="display.is_military && display.zip_code" class="flex justify-between border-b pb-1">
-                                <span class="text-gray-600">Current ZIP Code:</span>
-                                <span class="font-medium">{{ display.zip_code }}</span>
-                            </div>
-                            <div v-if="display.is_military && display.pay_grade" class="flex justify-between border-b pb-1">
-                                <span class="text-gray-600">Pay Grade:</span>
-                                <span class="font-medium">{{ display.pay_grade }}</span>
-                            </div>
-                            <div v-if="display.is_military" class="flex justify-between border-b pb-1">
-                                <span class="text-gray-600">With Dependents:</span>
-                                <span class="font-medium">{{ display.has_dependents ? 'Yes' : 'No' }}</span>
                             </div>
                         </div>
 
@@ -277,63 +245,6 @@ const transformData = (data) => ({
                                         type="number"
                                         class="block w-full rounded-md border-gray-300 pl-7 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                                     />
-                                </div>
-                            </div>
-
-                            <div class="flex items-center">
-                                <input
-                                    id="military"
-                                    name="is_military"
-                                    type="checkbox"
-                                    :checked="display.is_military"
-                                    class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700"
-                                />
-                                <Tooltip content="Basic Allowance for Housing (BAH) varies by location, pay grade, and dependency status. Enable this to compare BAH rates between locations.">
-                                    <label for="military" class="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                                        Active duty military (show BAH comparison)
-                                    </label>
-                                </Tooltip>
-                            </div>
-
-                            <div v-if="display.is_military" class="space-y-4 rounded-lg bg-gray-50 p-4 dark:bg-gray-700/50">
-                                <div>
-                                    <label for="zip_code" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Current ZIP Code</label>
-                                    <input
-                                        id="zip_code"
-                                        name="zip_code"
-                                        :value="display.zip_code"
-                                        type="text"
-                                        maxlength="5"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label for="pay_grade" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Pay Grade</label>
-                                    <select
-                                        id="pay_grade"
-                                        name="pay_grade"
-                                        :value="display.pay_grade"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                                    >
-                                        <option value="">Select...</option>
-                                        <option v-for="grade in ['E-1', 'E-2', 'E-3', 'E-4', 'E-5', 'E-6', 'E-7', 'E-8', 'E-9', 'O-1', 'O-2', 'O-3', 'O-4', 'O-5', 'O-6', 'O-7', 'O-8', 'O-9', 'O-10']" :key="grade" :value="grade">
-                                            {{ grade }}
-                                        </option>
-                                    </select>
-                                </div>
-
-                                <div class="flex items-center">
-                                    <input
-                                        id="dependents"
-                                        name="has_dependents"
-                                        type="checkbox"
-                                        :checked="display.has_dependents"
-                                        class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700"
-                                    />
-                                    <label for="dependents" class="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                                        With dependents
-                                    </label>
                                 </div>
                             </div>
                         </Form>
