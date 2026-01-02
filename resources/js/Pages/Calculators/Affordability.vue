@@ -160,12 +160,14 @@ const transformData = (data) => ({
     disability_dependents: (data.has_spouse === 'on' || data.has_spouse === true ? 1 : 0) + (parseInt(data.children_count) || 0),
 })
 
-// Calculate recommended purchase price based on 30% of income (Dave Ramsey)
-const recommendedPurchasePrice = () => {
+// Calculate recommended purchase price based on 30% DTI (conservative approach)
+const recommendedPurchasePrice = computed(() => {
     if (!props.results) return null
 
     const monthlyIncome = (display.annual_income / 12) + (props.results.disability_income || 0)
-    const maxHousingPayment = monthlyIncome * 0.30
+    // Use 30% DTI for recommended, then subtract existing debts
+    const maxTotalDebt = monthlyIncome * 0.30
+    const maxHousingPayment = maxTotalDebt - (display.monthly_debts || 0)
 
     if (maxHousingPayment <= 0) return 0
 
@@ -189,7 +191,36 @@ const recommendedPurchasePrice = () => {
                              (paymentFactor + monthlyTaxInsuranceRate)
 
     return Math.max(0, Math.round(recommendedPrice))
-}
+})
+
+// Calculate recommended monthly payment breakdown
+const recommendedBreakdown = computed(() => {
+    const price = recommendedPurchasePrice.value
+    if (!price || !props.results) return null
+
+    const loanAmount = Math.max(0, price - display.down_payment)
+    const monthlyRate = (display.interest_rate / 100) / 12
+    const numPayments = display.loan_term_years * 12
+
+    let principalInterest
+    if (monthlyRate === 0) {
+        principalInterest = loanAmount / numPayments
+    } else {
+        principalInterest = loanAmount * (monthlyRate * Math.pow(1 + monthlyRate, numPayments)) /
+                           (Math.pow(1 + monthlyRate, numPayments) - 1)
+    }
+
+    const taxes = (price * 0.011) / 12
+    const insurance = (price * 0.004) / 12
+    const total = principalInterest + taxes + insurance
+
+    return {
+        principalInterest: Math.round(principalInterest),
+        taxes: Math.round(taxes),
+        insurance: Math.round(insurance),
+        total: Math.round(total),
+    }
+})
 </script>
 
 <template>
@@ -482,13 +513,13 @@ const recommendedPurchasePrice = () => {
                                 </div>
 
                                 <div class="rounded-lg border-2 border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-900/30">
-                                    <Tooltip content="Based on Dave Ramsey's recommendation to keep your housing payment at no more than 30% of your gross monthly income.">
+                                    <Tooltip content="Conservative recommendation keeping total debt (including your existing monthly debts) at no more than 30% of your gross monthly income.">
                                         <span class="text-sm font-medium text-green-700 dark:text-green-300">Recommended</span>
                                     </Tooltip>
                                     <p class="text-2xl font-bold text-green-900 dark:text-white sm:text-3xl">
-                                        <AnimatedNumber :value="recommendedPurchasePrice()" :format="formatCurrency" />
+                                        <AnimatedNumber :value="recommendedPurchasePrice" :format="formatCurrency" />
                                     </p>
-                                    <p class="mt-1 text-xs text-green-800 dark:text-green-200">Based on 30% of income</p>
+                                    <p class="mt-1 text-xs text-green-800 dark:text-green-200">Based on 30% DTI</p>
                                 </div>
                             </div>
 
@@ -496,22 +527,38 @@ const recommendedPurchasePrice = () => {
                             <div>
                                 <h3 class="mb-3 font-medium text-gray-900 dark:text-white">Monthly Payment Breakdown</h3>
                                 <div class="space-y-2">
-                                    <div class="flex justify-between">
+                                    <!-- Header Row -->
+                                    <div class="grid grid-cols-3 gap-2 text-sm">
+                                        <span></span>
+                                        <span class="text-right font-medium text-blue-700 dark:text-blue-400">Maximum</span>
+                                        <span class="text-right font-medium text-green-700 dark:text-green-400">Recommended</span>
+                                    </div>
+                                    <!-- Principal & Interest -->
+                                    <div class="grid grid-cols-3 gap-2">
                                         <span class="text-gray-600 dark:text-gray-300">Principal & Interest</span>
-                                        <span class="font-medium dark:text-white">{{ formatCurrency(props.results.monthly_principal_interest) }}</span>
+                                        <span class="text-right font-medium dark:text-white">{{ formatCurrency(props.results.monthly_principal_interest) }}</span>
+                                        <span class="text-right font-medium dark:text-white">{{ formatCurrency(recommendedBreakdown?.principalInterest || 0) }}</span>
                                     </div>
-                                    <div class="flex justify-between">
+                                    <!-- Property Taxes -->
+                                    <div class="grid grid-cols-3 gap-2">
                                         <span class="text-gray-600 dark:text-gray-300">Property Taxes (est.)</span>
-                                        <span class="font-medium dark:text-white">{{ formatCurrency(props.results.monthly_taxes) }}</span>
+                                        <span class="text-right font-medium dark:text-white">{{ formatCurrency(props.results.monthly_taxes) }}</span>
+                                        <span class="text-right font-medium dark:text-white">{{ formatCurrency(recommendedBreakdown?.taxes || 0) }}</span>
                                     </div>
-                                    <div class="flex justify-between">
+                                    <!-- Home Insurance -->
+                                    <div class="grid grid-cols-3 gap-2">
                                         <span class="text-gray-600 dark:text-gray-300">Home Insurance (est.)</span>
-                                        <span class="font-medium dark:text-white">{{ formatCurrency(props.results.monthly_insurance) }}</span>
+                                        <span class="text-right font-medium dark:text-white">{{ formatCurrency(props.results.monthly_insurance) }}</span>
+                                        <span class="text-right font-medium dark:text-white">{{ formatCurrency(recommendedBreakdown?.insurance || 0) }}</span>
                                     </div>
-                                    <div class="flex justify-between border-t pt-2 dark:border-gray-700">
-                                        <span class="font-semibold text-gray-900 dark:text-white">Total Monthly Payment</span>
-                                        <span class="font-bold text-blue-600 dark:text-blue-400">
+                                    <!-- Total -->
+                                    <div class="grid grid-cols-3 gap-2 border-t pt-2 dark:border-gray-700">
+                                        <span class="font-semibold text-gray-900 dark:text-white">Total Monthly</span>
+                                        <span class="text-right font-bold text-blue-600 dark:text-blue-400">
                                             <AnimatedNumber :value="props.results.monthly_payment" :format="formatCurrency" />
+                                        </span>
+                                        <span class="text-right font-bold text-green-600 dark:text-green-400">
+                                            <AnimatedNumber :value="recommendedBreakdown?.total || 0" :format="formatCurrency" />
                                         </span>
                                     </div>
                                 </div>
