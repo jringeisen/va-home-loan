@@ -1,11 +1,15 @@
 <script setup>
-import { Head, Form } from '@inertiajs/vue3'
+import { Form, usePage } from '@inertiajs/vue3'
 import { computed } from 'vue'
 import AppLayout from '@/Components/Layout/AppLayout.vue'
 import Tooltip from '@/Components/UI/Tooltip.vue'
 import AnimatedNumber from '@/Components/UI/AnimatedNumber.vue'
 import CalculatorActions from '@/Components/Calculator/CalculatorActions.vue'
 import SaveCalculationModal from '@/Components/Calculator/SaveCalculationModal.vue'
+import SeoHead from '@/Components/Seo/SeoHead.vue'
+import Breadcrumbs from '@/Components/Seo/Breadcrumbs.vue'
+import FaqSection from '@/Components/Seo/FaqSection.vue'
+import RelatedTools from '@/Components/Seo/RelatedTools.vue'
 import { useCalculator } from '@/Composables/useCalculator'
 
 const props = defineProps({
@@ -13,6 +17,68 @@ const props = defineProps({
     results: Object,
     inputs: Object,
 })
+
+// Get shared SEO data
+const page = usePage()
+const appUrl = computed(() => page.props.seo?.appUrl || '')
+
+// SEO Data
+const seoTitle = 'Military Cost of Living Calculator | Compare States for PCS'
+const seoDescription = 'Compare cost of living between states for military PCS moves. Includes BAH rates, housing costs, and equivalent salary calculations for veterans.'
+const canonical = computed(() => `${appUrl.value}/calculators/cost-of-living`)
+
+// Breadcrumbs
+const breadcrumbItems = computed(() => [
+    { name: 'Home', url: appUrl.value || '/' },
+    { name: 'Calculators', url: `${appUrl.value}/calculators/affordability` },
+    { name: 'Cost of Living Calculator', url: `${appUrl.value}/calculators/cost-of-living` },
+])
+
+// FAQ Data for SEO
+const faqQuestions = [
+    {
+        question: 'How does cost of living vary between states for military?',
+        answer: 'Cost of living varies significantly between states, with factors like housing, utilities, transportation, and groceries all playing a role. For military families, the impact is partially offset by BAH (Basic Allowance for Housing), which adjusts based on your duty station location. High-cost areas like California and Hawaii have higher BAH rates, while lower-cost states may provide more purchasing power with your base pay.',
+    },
+    {
+        question: 'What is BAH and how does it affect my move decision?',
+        answer: 'BAH (Basic Allowance for Housing) is a tax-free military benefit that helps cover housing costs at your duty station. BAH rates are calculated based on your pay grade, dependency status, and the cost of housing in your ZIP code area. When considering a PCS move, comparing BAH rates between locations can help you understand how your housing budget will change.',
+    },
+    {
+        question: 'Which states have the lowest cost of living for veterans?',
+        answer: 'States with the lowest overall cost of living typically include Mississippi, Oklahoma, Kansas, Alabama, and Missouri. These states offer lower housing costs, utilities, and general expenses. However, veterans should also consider factors like state income tax exemptions for military retirement pay, property tax exemptions for disabled veterans, and access to VA healthcare facilities.',
+    },
+    {
+        question: 'How do I calculate equivalent salary when moving states?',
+        answer: 'To calculate equivalent salary, you adjust your current income by the cost of living difference between states. If you earn $75,000 in Texas and move to California where costs are 20% higher, you would need approximately $90,000 to maintain the same standard of living. Our calculator performs this calculation automatically based on comprehensive cost of living data.',
+    },
+    {
+        question: 'What factors should veterans consider when relocating?',
+        answer: 'Beyond cost of living, veterans should consider: state income tax treatment of military retirement and VA disability, property tax exemptions for veterans, proximity to VA healthcare facilities, job market for your skills, quality of schools if you have children, climate preferences, and distance from family. Many states offer significant tax benefits for veterans that can offset higher living costs.',
+    },
+    {
+        question: 'Are there states with no income tax for military?',
+        answer: 'Nine states have no state income tax at all: Alaska, Florida, Nevada, New Hampshire (limited), South Dakota, Tennessee, Texas, Washington, and Wyoming. Additionally, many states exempt military retirement pay from state income tax, and all states exempt VA disability compensation from taxation. This can result in significant savings for veterans and retirees.',
+    },
+    {
+        question: 'How accurate is cost of living data for PCS planning?',
+        answer: 'Our calculator uses data from MERIC (Missouri Economic Research and Information Center) which provides quarterly cost of living indices based on actual pricing data. While individual experiences may vary based on lifestyle choices, this data provides a reliable baseline for comparing states. For PCS moves, combining this with BAH rate comparisons gives a comprehensive view of financial impact.',
+    },
+]
+
+// Related Tools
+const relatedTools = computed(() => [
+    {
+        name: 'VA Loan Affordability Calculator',
+        url: `${appUrl.value}/calculators/affordability`,
+        description: 'Calculate your maximum VA home loan amount',
+    },
+    {
+        name: 'VA Disability Calculator',
+        url: `${appUrl.value}/calculators/disability`,
+        description: 'Estimate your VA disability compensation',
+    },
+])
 
 // Default form values
 const defaultValues = {
@@ -90,18 +156,38 @@ const transformData = (data) => ({
 
 <template>
     <AppLayout>
-        <Head title="Cost of Living Comparison Calculator">
-            <meta name="description" content="Compare cost of living between states for PCS moves and retirement planning. Includes housing, utilities, transportation, and BAH rate comparisons for military." />
-            <meta property="og:title" content="Cost of Living Comparison - Compare States for Military Moves" />
-            <meta property="og:description" content="Free cost of living calculator for veterans and military families. Compare states, calculate equivalent salary, and plan your next PCS move." />
-        </Head>
+        <SeoHead
+            :title="seoTitle"
+            :description="seoDescription"
+            :canonical="canonical"
+            :faq-schema="faqQuestions"
+            :breadcrumb-schema="breadcrumbItems"
+        />
 
         <div class="py-12">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <!-- Breadcrumbs -->
+                <div class="no-print">
+                    <Breadcrumbs :items="breadcrumbItems" />
+                </div>
+
                 <div class="mb-8">
-                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Cost of Living Comparison</h1>
+                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Cost of Living Comparison Calculator</h1>
                     <p class="mt-2 text-gray-600 dark:text-gray-300">
                         Compare cost of living between states to make informed decisions about relocations.
+                    </p>
+                </div>
+
+                <!-- Intro Content for SEO -->
+                <div class="prose prose-blue mb-8 max-w-none no-print dark:prose-invert">
+                    <p class="text-gray-700 dark:text-gray-300">
+                        Planning a PCS move or considering retirement relocation? Understanding the cost of living differences between states is crucial for maintaining your standard of living. This calculator compares comprehensive cost data across housing, utilities, transportation, groceries, healthcare, and more.
+                    </p>
+                    <p class="text-gray-700 dark:text-gray-300">
+                        For active-duty service members, we also compare BAH (Basic Allowance for Housing) rates between locations to give you a complete picture of how your military compensation will be affected by the move.
+                    </p>
+                    <p class="text-gray-700 dark:text-gray-300">
+                        Enter your current and destination states, along with your salary, to see the percentage difference in costs and calculate the equivalent salary you would need to maintain your current lifestyle.
                     </p>
                 </div>
 
@@ -333,7 +419,7 @@ const transformData = (data) => ({
                 </div>
 
                 <!-- Data Sources -->
-                <div class="mt-8 rounded-lg bg-gray-50 p-4 dark:bg-gray-800/50">
+                <div class="mt-8 rounded-lg bg-gray-50 p-4 no-print dark:bg-gray-800/50">
                     <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">Data Sources</h3>
                     <ul class="mt-2 space-y-1 text-xs text-gray-600 dark:text-gray-300">
                         <li>
@@ -349,6 +435,16 @@ const transformData = (data) => ({
                             </a>
                         </li>
                     </ul>
+                </div>
+
+                <!-- FAQ Section -->
+                <div class="no-print">
+                    <FaqSection :questions="faqQuestions" />
+                </div>
+
+                <!-- Related Tools -->
+                <div class="no-print">
+                    <RelatedTools :tools="relatedTools" />
                 </div>
             </div>
         </div>

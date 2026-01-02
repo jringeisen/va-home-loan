@@ -174,6 +174,15 @@ This application uses a "pay what you want" model instead of subscriptions:
 - Supporters get lifetime access to unlimited saves
 - Payments processed via Stripe Checkout
 
+## SEO Setup
+
+The application includes comprehensive SEO optimization. Before going to production:
+
+1. **Update robots.txt** - Edit `public/robots.txt` and replace the sitemap URL with your production domain
+2. **Generate sitemap** - Run `php artisan sitemap:generate` to create/update `public/sitemap.xml`
+3. **Validate structured data** - Test your pages at [Google's Rich Results Test](https://search.google.com/test/rich-results)
+4. **Submit to Google** - Add your sitemap URL to [Google Search Console](https://search.google.com/search-console)
+
 ## License
 
 This project is proprietary software.

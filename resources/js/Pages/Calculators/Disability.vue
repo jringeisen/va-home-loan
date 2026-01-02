@@ -1,10 +1,15 @@
 <script setup>
-import { Head, Form } from '@inertiajs/vue3'
+import { Form, usePage } from '@inertiajs/vue3'
+import { computed } from 'vue'
 import AppLayout from '@/Components/Layout/AppLayout.vue'
 import Tooltip from '@/Components/UI/Tooltip.vue'
 import AnimatedNumber from '@/Components/UI/AnimatedNumber.vue'
 import CalculatorActions from '@/Components/Calculator/CalculatorActions.vue'
 import SaveCalculationModal from '@/Components/Calculator/SaveCalculationModal.vue'
+import SeoHead from '@/Components/Seo/SeoHead.vue'
+import Breadcrumbs from '@/Components/Seo/Breadcrumbs.vue'
+import FaqSection from '@/Components/Seo/FaqSection.vue'
+import RelatedTools from '@/Components/Seo/RelatedTools.vue'
 import { useCalculator } from '@/Composables/useCalculator'
 
 const props = defineProps({
@@ -12,6 +17,68 @@ const props = defineProps({
     results: Object,
     inputs: Object,
 })
+
+// Get shared SEO data
+const page = usePage()
+const appUrl = computed(() => page.props.seo?.appUrl || '')
+
+// SEO Data
+const seoTitle = 'VA Disability Calculator 2025 | Monthly Compensation Rates'
+const seoDescription = 'Calculate your VA disability compensation with 2025 rates. Includes dependent additions, state tax benefits, and property tax exemptions for veterans.'
+const canonical = computed(() => `${appUrl.value}/calculators/disability`)
+
+// Breadcrumbs
+const breadcrumbItems = computed(() => [
+    { name: 'Home', url: appUrl.value || '/' },
+    { name: 'Calculators', url: `${appUrl.value}/calculators/affordability` },
+    { name: 'Disability Calculator', url: `${appUrl.value}/calculators/disability` },
+])
+
+// FAQ Data for SEO
+const faqQuestions = [
+    {
+        question: 'How is VA disability compensation calculated?',
+        answer: 'VA disability compensation is calculated based on your combined disability rating and number of dependents. The VA uses a specific rate table that increases with your disability percentage. Veterans with ratings of 30% or higher receive additional compensation for dependents including spouses, children, and dependent parents.',
+    },
+    {
+        question: 'What are the 2025 VA disability pay rates?',
+        answer: 'For 2025, VA disability rates range from $171.23/month for a 10% rating to $3,737.85/month for a 100% rating for veterans without dependents. These rates receive an annual cost-of-living adjustment (COLA). Veterans with dependents receive higher amounts, with the increase varying based on rating level and number of dependents.',
+    },
+    {
+        question: 'Do dependents increase my VA disability payment?',
+        answer: 'Yes, if your disability rating is 30% or higher, you receive additional compensation for dependents. This includes your spouse, children under 18, children 18-23 in school, and dependent parents. The additional amount varies based on your rating level - higher ratings provide larger dependent additions.',
+    },
+    {
+        question: 'Is VA disability compensation taxable?',
+        answer: 'No, VA disability compensation is completely tax-free at the federal level. Most states also exempt VA disability benefits from state income tax. This tax-free status makes VA disability benefits more valuable than equivalent taxable income and should be considered when comparing to other income sources.',
+    },
+    {
+        question: 'What state benefits do disabled veterans receive?',
+        answer: 'State benefits vary significantly but may include: property tax exemptions (partial or full based on rating), state income tax exemptions, vehicle registration fee waivers, hunting and fishing license discounts, state park access, and education benefits. Some states offer full property tax exemption for 100% disabled veterans.',
+    },
+    {
+        question: 'How do I know my VA disability rating?',
+        answer: 'Your VA disability rating is determined through the VA claims process. You can view your current rating by logging into VA.gov, calling the VA at 1-800-827-1000, or reviewing your VA benefits letter. If you have multiple conditions, the VA uses "VA math" to calculate your combined rating, which is not a simple addition.',
+    },
+    {
+        question: 'Can I receive VA disability and work at the same time?',
+        answer: 'Yes, you can work while receiving VA disability compensation at any rating level, including 100%. VA disability is based on your service-connected conditions, not your ability to work. However, if you receive Total Disability Individual Unemployability (TDIU), there are specific work limitations to maintain that benefit.',
+    },
+]
+
+// Related Tools
+const relatedTools = computed(() => [
+    {
+        name: 'VA Loan Affordability Calculator',
+        url: `${appUrl.value}/calculators/affordability`,
+        description: 'Calculate your maximum VA home loan amount',
+    },
+    {
+        name: 'Cost of Living Calculator',
+        url: `${appUrl.value}/calculators/cost-of-living`,
+        description: 'Compare cost of living between states for PCS moves',
+    },
+])
 
 // Default form values
 const defaultValues = {
@@ -73,18 +140,38 @@ const transformData = (data) => ({
 
 <template>
     <AppLayout>
-        <Head title="VA Disability Compensation Calculator - 2025 Rates">
-            <meta name="description" content="Calculate your VA disability compensation with 2025 rates. Includes dependent additions, state tax benefits, property tax exemptions, and additional VA benefits." />
-            <meta property="og:title" content="VA Disability Calculator - 2025 Compensation Rates" />
-            <meta property="og:description" content="Free VA disability compensation calculator with current 2025 rates. Calculate monthly benefits, state tax exemptions, and property tax savings." />
-        </Head>
+        <SeoHead
+            :title="seoTitle"
+            :description="seoDescription"
+            :canonical="canonical"
+            :faq-schema="faqQuestions"
+            :breadcrumb-schema="breadcrumbItems"
+        />
 
         <div class="py-12">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <!-- Breadcrumbs -->
+                <div class="no-print">
+                    <Breadcrumbs :items="breadcrumbItems" />
+                </div>
+
                 <div class="mb-8">
-                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Disability Rating Impact Calculator</h1>
+                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white">VA Disability Compensation Calculator</h1>
                     <p class="mt-2 text-gray-600 dark:text-gray-300">
                         Calculate your monthly compensation and discover state-specific tax benefits based on your VA disability rating.
+                    </p>
+                </div>
+
+                <!-- Intro Content for SEO -->
+                <div class="prose prose-blue mb-8 max-w-none no-print dark:prose-invert">
+                    <p class="text-gray-700 dark:text-gray-300">
+                        Understanding your VA disability compensation is essential for financial planning. This calculator uses the current 2025 VA disability rates to estimate your monthly tax-free compensation based on your rating and dependents.
+                    </p>
+                    <p class="text-gray-700 dark:text-gray-300">
+                        Beyond federal compensation, many states offer additional benefits for disabled veterans including property tax exemptions, state income tax exemptions, and other valuable programs. Our calculator factors in your state of residence to provide a comprehensive view of your potential benefits.
+                    </p>
+                    <p class="text-gray-700 dark:text-gray-300">
+                        Enter your disability rating, dependent information, and state below to see your estimated monthly compensation, annual benefits, and state-specific tax savings.
                     </p>
                 </div>
 
@@ -349,7 +436,7 @@ const transformData = (data) => ({
                 </div>
 
                 <!-- Data Sources -->
-                <div class="mt-8 rounded-lg bg-gray-50 p-4 dark:bg-gray-800/50">
+                <div class="mt-8 rounded-lg bg-gray-50 p-4 no-print dark:bg-gray-800/50">
                     <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">Data Sources</h3>
                     <ul class="mt-2 space-y-1 text-xs text-gray-600 dark:text-gray-300">
                         <li>
@@ -359,6 +446,16 @@ const transformData = (data) => ({
                             </a>
                         </li>
                     </ul>
+                </div>
+
+                <!-- FAQ Section -->
+                <div class="no-print">
+                    <FaqSection :questions="faqQuestions" />
+                </div>
+
+                <!-- Related Tools -->
+                <div class="no-print">
+                    <RelatedTools :tools="relatedTools" />
                 </div>
             </div>
         </div>

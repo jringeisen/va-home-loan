@@ -1,17 +1,87 @@
 <script setup>
-import { Head, Form } from '@inertiajs/vue3'
+import { Form, usePage } from '@inertiajs/vue3'
 import { computed } from 'vue'
 import AppLayout from '@/Components/Layout/AppLayout.vue'
 import Tooltip from '@/Components/UI/Tooltip.vue'
 import AnimatedNumber from '@/Components/UI/AnimatedNumber.vue'
 import CalculatorActions from '@/Components/Calculator/CalculatorActions.vue'
 import SaveCalculationModal from '@/Components/Calculator/SaveCalculationModal.vue'
+import SeoHead from '@/Components/Seo/SeoHead.vue'
+import Breadcrumbs from '@/Components/Seo/Breadcrumbs.vue'
+import FaqSection from '@/Components/Seo/FaqSection.vue'
+import RelatedTools from '@/Components/Seo/RelatedTools.vue'
 import { useCalculator } from '@/Composables/useCalculator'
 
 const props = defineProps({
     results: Object,
     inputs: Object,
 })
+
+// Get shared SEO data
+const page = usePage()
+const appUrl = computed(() => page.props.seo?.appUrl || '')
+
+// SEO Data
+const seoTitle = 'VA Loan Affordability Calculator | How Much Home Can You Afford?'
+const seoDescription = 'Calculate your maximum VA home loan amount based on income, debts, and disability benefits. Free calculator with funding fee estimates and no PMI savings.'
+const canonical = computed(() => `${appUrl.value}/calculators/affordability`)
+
+// Breadcrumbs
+const breadcrumbItems = computed(() => [
+    { name: 'Home', url: appUrl.value || '/' },
+    { name: 'Calculators', url: `${appUrl.value}/calculators/affordability` },
+    { name: 'Affordability Calculator', url: `${appUrl.value}/calculators/affordability` },
+])
+
+// FAQ Data for SEO
+const faqQuestions = [
+    {
+        question: 'How much house can I afford with a VA loan?',
+        answer: 'The amount of house you can afford with a VA loan depends on your income, existing debts, credit score, and current interest rates. VA loans use a debt-to-income (DTI) ratio of up to 41% to determine affordability. Our calculator factors in your annual income, monthly debt payments, down payment, and VA disability benefits to give you an accurate estimate of your maximum purchase price.',
+    },
+    {
+        question: 'What is the debt-to-income ratio for VA loans?',
+        answer: 'VA loans typically allow a maximum debt-to-income (DTI) ratio of 41%. This means your total monthly debts, including your new mortgage payment, should not exceed 41% of your gross monthly income. However, some lenders may approve higher ratios with compensating factors such as excellent credit, significant savings, or VA disability income.',
+    },
+    {
+        question: 'Does VA disability income count for VA loan qualification?',
+        answer: 'Yes, VA disability compensation is considered stable, tax-free income and can be used to qualify for a VA loan. Since it\'s non-taxable, lenders often "gross up" this income by 25% when calculating your DTI ratio. For example, $2,000 in monthly disability benefits might count as $2,500 for qualification purposes.',
+    },
+    {
+        question: 'What is the VA funding fee and who is exempt?',
+        answer: 'The VA funding fee is a one-time fee paid to the VA that helps sustain the loan program. It ranges from 1.25% to 3.3% of the loan amount, depending on your down payment and whether it\'s your first VA loan. Veterans with a service-connected disability rating of 10% or higher are exempt from paying the funding fee, potentially saving thousands of dollars.',
+    },
+    {
+        question: 'Do VA loans require PMI?',
+        answer: 'No, VA loans do not require Private Mortgage Insurance (PMI), regardless of your down payment amount. This is one of the major benefits of VA loans compared to conventional mortgages, which typically require PMI for down payments less than 20%. This can save you hundreds of dollars per month.',
+    },
+    {
+        question: 'Can I get a VA loan with no down payment?',
+        answer: 'Yes, one of the biggest advantages of VA loans is the ability to purchase a home with no down payment. VA loans are one of the only loan programs that offer 100% financing for eligible veterans, service members, and surviving spouses. However, making a down payment can reduce your VA funding fee and monthly payments.',
+    },
+    {
+        question: 'What credit score do I need for a VA loan?',
+        answer: 'The VA does not set a minimum credit score requirement, but most lenders require a score of at least 620. Some lenders may approve borrowers with lower scores, especially those with compensating factors. A higher credit score typically results in better interest rates and more favorable loan terms.',
+    },
+    {
+        question: 'How does VA loan affordability differ from conventional loans?',
+        answer: 'VA loans offer several advantages that can increase your buying power compared to conventional loans: no down payment requirement, no PMI, competitive interest rates, and the ability to include VA disability income. Additionally, VA loans have more flexible DTI requirements and may accept lower credit scores, making homeownership accessible to more veterans.',
+    },
+]
+
+// Related Tools
+const relatedTools = computed(() => [
+    {
+        name: 'VA Disability Calculator',
+        url: `${appUrl.value}/calculators/disability`,
+        description: 'Estimate your VA disability compensation with 2025 rates',
+    },
+    {
+        name: 'Cost of Living Calculator',
+        url: `${appUrl.value}/calculators/cost-of-living`,
+        description: 'Compare cost of living between states for PCS moves',
+    },
+])
 
 // Default form values
 const defaultValues = {
@@ -124,18 +194,38 @@ const recommendedPurchasePrice = () => {
 
 <template>
     <AppLayout>
-        <Head title="VA Loan Affordability Calculator">
-            <meta name="description" content="Calculate your maximum VA home loan purchase price based on income, debts, and VA benefits. Includes funding fee calculations, disability income, and no PMI savings." />
-            <meta property="og:title" content="VA Loan Affordability Calculator - How Much Home Can You Afford?" />
-            <meta property="og:description" content="Free VA loan affordability calculator for veterans. Factor in disability income, funding fee exemptions, and no PMI to find your max home price." />
-        </Head>
+        <SeoHead
+            :title="seoTitle"
+            :description="seoDescription"
+            :canonical="canonical"
+            :faq-schema="faqQuestions"
+            :breadcrumb-schema="breadcrumbItems"
+        />
 
         <div class="py-12">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <!-- Breadcrumbs -->
+                <div class="no-print">
+                    <Breadcrumbs :items="breadcrumbItems" />
+                </div>
+
                 <div class="mb-8">
                     <h1 class="text-3xl font-bold text-gray-900 dark:text-white">VA Loan Affordability Calculator</h1>
                     <p class="mt-2 text-gray-600 dark:text-gray-300">
                         Calculate your maximum home purchase price based on your income, debts, and VA loan benefits.
+                    </p>
+                </div>
+
+                <!-- Intro Content for SEO -->
+                <div class="prose prose-blue mb-8 max-w-none no-print dark:prose-invert">
+                    <p class="text-gray-700 dark:text-gray-300">
+                        Understanding how much home you can afford is the first step in your VA home buying journey. This VA loan affordability calculator helps veterans, active-duty service members, and eligible surviving spouses determine their maximum purchase price based on the unique benefits of VA home loans.
+                    </p>
+                    <p class="text-gray-700 dark:text-gray-300">
+                        Unlike conventional mortgages, VA loans offer significant advantages including no down payment requirement, no private mortgage insurance (PMI), and competitive interest rates. Our calculator takes these benefits into account, along with your VA disability rating if applicable, to provide an accurate estimate of what you can afford.
+                    </p>
+                    <p class="text-gray-700 dark:text-gray-300">
+                        Simply enter your annual income, monthly debt payments, and other details below. The calculator uses the VA's standard 41% debt-to-income ratio and also shows a recommended purchase price based on the 30% income rule for comfortable monthly payments.
                     </p>
                 </div>
 
@@ -480,7 +570,7 @@ const recommendedPurchasePrice = () => {
                 </div>
 
                 <!-- Data Sources -->
-                <div class="mt-8 rounded-lg bg-gray-50 p-4 dark:bg-gray-800/50">
+                <div class="mt-8 rounded-lg bg-gray-50 p-4 no-print dark:bg-gray-800/50">
                     <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">Data Sources</h3>
                     <ul class="mt-2 space-y-1 text-xs text-gray-600 dark:text-gray-300">
                         <li>
@@ -490,6 +580,16 @@ const recommendedPurchasePrice = () => {
                             </a>
                         </li>
                     </ul>
+                </div>
+
+                <!-- FAQ Section -->
+                <div class="no-print">
+                    <FaqSection :questions="faqQuestions" />
+                </div>
+
+                <!-- Related Tools -->
+                <div class="no-print">
+                    <RelatedTools :tools="relatedTools" />
                 </div>
             </div>
         </div>

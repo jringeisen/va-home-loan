@@ -1,2 +1,15 @@
 User-agent: *
-Disallow:
+Allow: /
+
+# Disallow private/authenticated areas
+Disallow: /dashboard
+Disallow: /dashboard/*
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /support
+Disallow: /support/*
+
+# Sitemap location
+Sitemap: https://va-home-loan.test/sitemap.xml

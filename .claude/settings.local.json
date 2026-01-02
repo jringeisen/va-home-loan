@@ -14,7 +14,11 @@
       "WebFetch(domain:docs.stripe.com)",
       "Bash(find:*)",
       "Bash(grep:*)",
-      "mcp__laravel-boost__database-schema"
+      "mcp__laravel-boost__database-schema",
+      "mcp__laravel-boost__application-info",
+      "mcp__laravel-boost__list-routes",
+      "Bash(tree:*)",
+      "mcp__laravel-boost__get-absolute-url"
     ]
   },
   "enableAllProjectMcpServers": true,

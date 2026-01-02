@@ -1,15 +1,52 @@
 <script setup>
-import { Head, Link } from '@inertiajs/vue3'
+import { Link, usePage } from '@inertiajs/vue3'
+import { computed } from 'vue'
 import GuestLayout from '@/Components/Layout/GuestLayout.vue'
+import SeoHead from '@/Components/Seo/SeoHead.vue'
+import FaqSection from '@/Components/Seo/FaqSection.vue'
+
+// Get shared SEO data
+const page = usePage()
+const appUrl = computed(() => page.props.seo?.appUrl || '')
+
+// SEO Data
+const seoTitle = 'VA Loan Calculator | Free VA Home Loan Tools for Veterans'
+const seoDescription = 'Free VA loan calculators for veterans and military families. Calculate home affordability, disability compensation, and compare cost of living by state.'
+const canonical = computed(() => appUrl.value || '/')
+
+// FAQ Data for SEO
+const faqQuestions = [
+    {
+        question: 'What is a VA loan and who is eligible?',
+        answer: 'A VA loan is a mortgage loan program backed by the U.S. Department of Veterans Affairs. Eligible recipients include veterans, active-duty service members, National Guard and Reserve members with qualifying service, and surviving spouses of veterans who died in service or from a service-connected disability. VA loans offer benefits like no down payment, no PMI, and competitive interest rates.',
+    },
+    {
+        question: 'How much can I borrow with a VA loan?',
+        answer: 'VA loans no longer have loan limits for borrowers with full entitlement. If you have remaining entitlement from a previous VA loan, limits may apply based on county loan limits. Our affordability calculator helps you determine how much you can borrow based on your income, debts, and VA benefits.',
+    },
+    {
+        question: 'What are the benefits of a VA loan vs conventional mortgage?',
+        answer: 'VA loans offer several advantages: no down payment required (vs 3-20% for conventional), no private mortgage insurance (PMI), competitive interest rates often lower than conventional, more flexible credit requirements, and no prepayment penalties. These benefits can save veterans thousands of dollars over the life of the loan.',
+    },
+    {
+        question: 'Do I have to pay the VA funding fee?',
+        answer: 'Most VA loan borrowers pay a one-time funding fee that ranges from 1.25% to 3.3% of the loan amount. However, veterans with a service-connected disability rating of 10% or higher are exempt from the funding fee. Surviving spouses receiving DIC benefits are also exempt.',
+    },
+    {
+        question: 'Can I use a VA loan to buy any type of property?',
+        answer: 'VA loans can be used for primary residences including single-family homes, condos (in VA-approved complexes), multi-unit properties (up to 4 units if you live in one), and manufactured homes. VA loans cannot be used for investment properties, vacation homes, or commercial real estate.',
+    },
+]
 </script>
 
 <template>
     <GuestLayout>
-        <Head title="Free VA Loan Calculators for Veterans">
-            <meta name="description" content="Free VA home loan calculators for veterans. Calculate affordability, compare cost of living between states, and estimate VA disability compensation with 2025 rates." />
-            <meta property="og:title" content="VA Home Loan Calculator - Free Tools for Veterans" />
-            <meta property="og:description" content="Free VA home loan calculators for veterans. Calculate affordability, compare cost of living, and estimate disability compensation." />
-        </Head>
+        <SeoHead
+            :title="seoTitle"
+            :description="seoDescription"
+            :canonical="canonical"
+            :faq-schema="faqQuestions"
+        />
 
         <!-- Hero Section -->
         <div class="bg-blue-600 dark:bg-blue-800">
@@ -125,6 +162,38 @@ import GuestLayout from '@/Components/Layout/GuestLayout.vue'
                         </Link>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Why Use Our Calculators Section -->
+        <div class="bg-gray-50 py-16 dark:bg-gray-900">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
+                        Why Use Our VA Loan Calculators?
+                    </h2>
+                </div>
+                <div class="prose prose-blue mx-auto mt-8 max-w-3xl dark:prose-invert">
+                    <p class="text-gray-700 dark:text-gray-300">
+                        VA loans are one of the most valuable benefits available to veterans, but understanding how they work can be complex. Our calculators are designed specifically for the unique aspects of VA loans, taking into account factors that generic mortgage calculators miss.
+                    </p>
+                    <p class="text-gray-700 dark:text-gray-300">
+                        Unlike conventional mortgage calculators, our VA loan affordability calculator factors in your VA disability income, calculates the VA funding fee (and exemptions), and shows you the savings from not paying PMI. This gives you a more accurate picture of what you can truly afford.
+                    </p>
+                    <p class="text-gray-700 dark:text-gray-300">
+                        We also help veterans with broader financial planning. Our disability calculator shows your compensation with current rates and state-specific tax benefits, while our cost of living calculator helps you plan PCS moves or retirement relocations by comparing living costs and BAH rates between states.
+                    </p>
+                    <p class="text-gray-700 dark:text-gray-300">
+                        All calculations are performed using the latest official VA rates and data sources, ensuring accuracy for your financial planning needs.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ Section -->
+        <div class="bg-white py-16 dark:bg-gray-800">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <FaqSection :questions="faqQuestions" title="Common Questions About VA Loans" />
             </div>
         </div>
 
