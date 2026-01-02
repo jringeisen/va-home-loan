@@ -181,7 +181,7 @@ const faqQuestions = [
                         Unlike conventional mortgage calculators, our VA loan affordability calculator factors in your VA disability income, calculates the VA funding fee (and exemptions), and shows you the savings from not paying PMI. This gives you a more accurate picture of what you can truly afford.
                     </p>
                     <p class="text-gray-700 dark:text-gray-300">
-                        We also help veterans with broader financial planning. Our disability calculator shows your compensation with current rates and state-specific tax benefits, while our cost of living calculator helps you plan PCS moves or retirement relocations by comparing living costs and BAH rates between states.
+                        We also help veterans with broader financial planning. Our disability calculator shows your compensation with current rates and state-specific tax benefits, while our cost of living calculator helps you plan PCS moves or retirement relocations by comparing living costs between states.
                     </p>
                     <p class="text-gray-700 dark:text-gray-300">
                         All calculations are performed using the latest official VA rates and data sources, ensuring accuracy for your financial planning needs.
