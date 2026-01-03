@@ -7,7 +7,9 @@ use App\Services\VaDisabilityCompensationService;
 class VaLoanAffordabilityCalculator
 {
     private const MAX_DTI_RATIO = 0.41; // VA allows up to 41% DTI
+
     private const PROPERTY_TAX_RATE = 0.011; // 1.1% average
+
     private const HOME_INSURANCE_RATE = 0.0035; // 0.35% of home value
 
     /**
@@ -164,6 +166,7 @@ class VaLoanAffordabilityCalculator
             $loanAmount = $mid - $downPayment;
             if ($loanAmount <= 0) {
                 $low = $mid;
+
                 continue;
             }
 

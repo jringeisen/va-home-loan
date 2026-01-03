@@ -6,6 +6,7 @@ use App\Http\Requests\CalculateAffordabilityRequest;
 use App\Http\Requests\CalculateCostOfLivingRequest;
 use App\Http\Requests\CalculateDisabilityRequest;
 use App\Http\Requests\StoreCalculationRequest;
+use App\Http\Requests\UpdateCalculationRequest;
 use App\Models\Calculation;
 use App\Services\Calculators\CostOfLivingCalculator;
 use App\Services\Calculators\DisabilityImpactCalculator;
@@ -135,26 +136,29 @@ class CalculatorController extends Controller
 
     public function store(StoreCalculationRequest $request): RedirectResponse
     {
-        $user = $request->user();
+        $this->authorize('create', Calculation::class);
 
-        if (! $user->canSaveCalculations()) {
-            return back()->with('error', 'Support the site to save unlimited calculations.');
-        }
-
-        $user->calculations()->create($request->validated());
+        $request->user()->calculations()->create($request->validated());
 
         return back()->with('success', 'Calculation saved successfully!');
     }
 
-    public function destroy(Request $request, Calculation $calculation): RedirectResponse
+    public function update(UpdateCalculationRequest $request, Calculation $calculation): RedirectResponse
     {
-        if ($calculation->user_id !== $request->user()->id) {
-            abort(403);
-        }
+        $this->authorize('update', $calculation);
+
+        $calculation->update($request->validated());
+
+        return back()->with('success', 'Calculation updated successfully!');
+    }
+
+    public function destroy(Calculation $calculation): RedirectResponse
+    {
+        $this->authorize('delete', $calculation);
 
         $calculation->delete();
 
-        return back();
+        return back()->with('success', 'Calculation deleted successfully!');
     }
 
     private function getStates(): array

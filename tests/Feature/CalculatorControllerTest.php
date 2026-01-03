@@ -383,8 +383,7 @@ describe('Saving Calculations', function () {
             'results' => ['max_purchase_price' => 350000],
         ]);
 
-        $response->assertRedirect()
-            ->assertSessionHas('error', 'Support the site to save unlimited calculations.');
+        $response->assertForbidden();
     });
 
     it('allows paid users to save calculations', function () {
@@ -443,6 +442,79 @@ describe('Saving Calculations', function () {
             'user_id' => $user->id,
             'type' => 'disability',
             'name' => null,
+        ]);
+    });
+});
+
+describe('Updating Calculations', function () {
+    it('requires authentication to update calculations', function () {
+        $calculation = Calculation::factory()->affordability()->create();
+
+        $response = $this->put("/calculations/{$calculation->id}", [
+            'inputs' => ['annual_income' => 80000],
+            'results' => ['max_purchase_price' => 400000],
+        ]);
+
+        $response->assertRedirect('/login');
+    });
+
+    it('prevents users from updating other users calculations', function () {
+        $owner = User::factory()->create();
+        $otherUser = User::factory()->create();
+        $calculation = Calculation::factory()->affordability()->for($owner)->create();
+
+        $response = $this->actingAs($otherUser)->put("/calculations/{$calculation->id}", [
+            'inputs' => ['annual_income' => 80000],
+            'results' => ['max_purchase_price' => 400000],
+        ]);
+
+        $response->assertForbidden();
+    });
+
+    it('allows users to update their own calculations', function () {
+        $user = User::factory()->create();
+        $calculation = Calculation::factory()->affordability()->for($user)->create();
+
+        $response = $this->actingAs($user)->put("/calculations/{$calculation->id}", [
+            'name' => 'Updated Calculation',
+            'inputs' => ['annual_income' => 80000],
+            'results' => ['max_purchase_price' => 400000],
+        ]);
+
+        $response->assertRedirect()
+            ->assertSessionHas('success', 'Calculation updated successfully!');
+
+        $this->assertDatabaseHas('calculations', [
+            'id' => $calculation->id,
+            'name' => 'Updated Calculation',
+        ]);
+    });
+
+    it('validates required update fields', function () {
+        $user = User::factory()->create();
+        $calculation = Calculation::factory()->affordability()->for($user)->create();
+
+        $response = $this->actingAs($user)->put("/calculations/{$calculation->id}", []);
+
+        $response->assertInvalid(['inputs', 'results']);
+    });
+
+    it('does not allow changing calculation type', function () {
+        $user = User::factory()->create();
+        $calculation = Calculation::factory()->affordability()->for($user)->create();
+
+        $response = $this->actingAs($user)->put("/calculations/{$calculation->id}", [
+            'type' => 'disability',
+            'inputs' => ['disability_rating' => 50],
+            'results' => ['total_monthly_compensation' => 1000],
+        ]);
+
+        $response->assertRedirect();
+
+        // Type should remain unchanged
+        $this->assertDatabaseHas('calculations', [
+            'id' => $calculation->id,
+            'type' => 'affordability',
         ]);
     });
 });

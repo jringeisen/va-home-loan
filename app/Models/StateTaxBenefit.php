@@ -61,8 +61,8 @@ class StateTaxBenefit extends Model
 
         return match ($this->property_tax_exemption_type) {
             'full' => 'Full property tax exemption',
-            'partial' => "Partial exemption up to $" . number_format($this->property_tax_exemption_amount, 0),
-            'percentage' => $this->property_tax_exemption_amount . '% exemption',
+            'partial' => 'Partial exemption up to $'.number_format($this->property_tax_exemption_amount, 0),
+            'percentage' => $this->property_tax_exemption_amount.'% exemption',
             default => $this->notes,
         };
     }

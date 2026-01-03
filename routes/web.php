@@ -26,8 +26,9 @@ Route::prefix('calculators')->name('calculators.')->group(function () {
 
 // Authenticated routes
 Route::middleware(['auth'])->group(function () {
-    // Save/delete calculations
+    // Calculation CRUD
     Route::post('/calculations', [CalculatorController::class, 'store'])->name('calculations.store');
+    Route::put('/calculations/{calculation}', [CalculatorController::class, 'update'])->name('calculations.update');
     Route::delete('/calculations/{calculation}', [CalculatorController::class, 'destroy'])->name('calculations.destroy');
 
     // Dashboard
